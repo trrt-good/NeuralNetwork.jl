@@ -1,6 +1,6 @@
 const initialWeightValue = 1
 const initialActivationValue = 1
-
+const initialBiasValue = 0
 
 function validateData(inputData::Array, outputData::Array)
     # do some checks like matching lengths of input and output 
@@ -28,9 +28,12 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
     #activators (does not include input layer):
     activators = Array{Array, 1}(undef, length(nodesInEachLayer)-1)
     for (index, entry) in enumerate(activators)
-        entry = Array{Float32, 1}(initialActivationValue, nodesInEachLayer[index + 1])
+        entry = Array{Float32, 1}(initialActivationValue, nodesInEachLayer[index])
     end
 
     #biases
-    biases = Array{}
+    biases = Array{Array, 1}(undef, length(nodesInEachLayer)-1)
+    for (index, entry) in enumerate(activators)
+        entry = Array{Float32, 1}(initialBiasValue, nodesInEachLayer[index + 1])
+    end
 end
