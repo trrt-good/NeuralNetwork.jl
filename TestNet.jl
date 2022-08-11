@@ -4,40 +4,67 @@ before scaling it to the flexible algorithm in `NeuralNet.jl`
 
 --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
 
-L1 : 3 nodes (input layer)
+L0 : 3 nodes (input layer)
+L1 : 4 nodes (hidden layer)
 L2 : 4 nodes (hidden layer)
-L4 : 2 nodes (output layer)
+L3 : 2 nodes (output layer)
 
-a1
+a0: input data
 
-a₂
-a₃
+a1: value of nodes in layer 1
+a2: value of nodes in layer 2
+a3: value of nodes in layer 3
 
-w₂
-w₃
+w1: weights for layer 1, which connect a0 and a1
+w2: weights for layer 2, which connect a1 and a2
+w3: weights for layer 3, which connect a2 and a3
 
-b₂
-b₃
-
-r(x) = max(x, 0)
-r'(x) = (x < 0)? 0 : x
-C(a₁) = (r(w₃*r(w₂*a₁+b₂)+b₃)-y)²
-tₙ(aₙ₋₁) = wₙ*aₙ₋₁+bₙ
-C(a₁) = (r(t₃(r(t₂(a₁))))-y)²
-C'(t₂) = 2*(r(t₃(r(t₂(a₁))))-y)*r'(t₃(r(t₂(a₁))))
-
-C'(a₂) = 
-
+b1: biases for layer 1
+b2: biases for layer 2
+b3: biases for layer 3
 
 """
 
-traingNeuralNet(a1::Array, x::Array)
+const LEARN_RATE = 0.5
+
+trainNeuralNet(a0::Array)
+    a1 = Array{Float32, 1}(1, 4)
     a2 = Array{Float32, 1}(1, 4)
-    a3 = Array{Float32, 1}(1, 4)
+    a3 = Array{Float32, 1}(1, 2)
+     
+    w1 = Array{Float32, 2}(1, 3, 4)
+    w2 = Array{Float32, 2}(1, 4, 4)
+    w3 = Array{Float32, 2}(1, 4, 2)
 
-    w2 = Array{Float32, 2}(1, 4, 3)
-    w3 = Array{Float32, 2}(1, 4, 4)
-
+    b1 = Array{Float32, 1}(0, 4)
     b2 = Array{Float32, 1}(0, 4)
-    b3 = Array{Float32, 1}(0, 4)
+    b3 = Array{Float32, 1}(0, 2)
+
+    for i in 1:1000
+        # run data through the network 
+        a1 = w1*a0+b1
+        a2 = w2*a1+b2
+        a3 = w3*a2+b3
+
+        # change weights
+        w1_temp = w1 - LEARN_RATE*2*transpose(w3*w2)*transpose(a0*transpose(a3))
+        w2_temp = w2 - LEARN_RATE*2*transpose(w3)*transpose(a1*transpose(a3))
+        w3_temp = w3 - LEARN_RATE*2*transpose(a2*transpose(a3))
+
+        # change biases
+        b1_temp = b1 - LEARN_RATE*2*transpose(w3*w2)*a3
+        b2_temp = b2 - LEARN_RATE*2*transpose(w3)*a3
+        b3_temp = b3 - LEARN_RATE*2*a3
+
+        # update actual weights and biases to temp values
+        w1 = w1_temp
+        w2 = w2_temp
+        w3 = w3_temp
+
+        b1 = b1_temp
+        b2 = b2_temp
+        b3 = b3_temp
+    end
+
+    
 end
