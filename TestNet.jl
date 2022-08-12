@@ -74,6 +74,8 @@ function fixedNeuralNet(a0::Array, y::Array)
         b2 = b2_temp
         b3 = b3_temp
 
+        print(a1)
+        print(a2)
         println(a3)
     end
 
