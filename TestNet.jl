@@ -25,18 +25,18 @@ b3: biases for layer 3
 
 """
 
-const LEARN_RATE = 0.005
+const LEARN_RATE = 0.01
 const INPUT_ARRAY = Array{Float32, 1}([1, -10, 3])
 const OUTPUT_ARRAY = Array{Float32, 1}([30, 50])
 
-function relu(A::Array)
-    for i in 1:length(A)
+function relu(A)
+    for i in eachindex(A)
         A[i] = max(0, A[i])
     end
     return A
 end
 
-function trainNeuralNet(a0::Array, y::Array)
+function fixedNeuralNet(a0::Array, y::Array)
     a1 = fill(1.0, 4)
     a2 = fill(1.0, 4)
     a3 = fill(1.0, 2)
@@ -56,14 +56,14 @@ function trainNeuralNet(a0::Array, y::Array)
         a3 = relu(w3*a2+b3)
 
         # change weights
-        w1_temp = w1 - LEARN_RATE*2*transpose(relu(w3*w2))*transpose(a0*transpose(a3-y))
-        w2_temp = w2 - LEARN_RATE*2*transpose(relu(w3))*transpose(a1*transpose(a3-y))
-        w3_temp = w3 - LEARN_RATE*2*transpose(a2*transpose(a3-y))
+        w1_temp = w1 - LEARN_RATE*transpose(w3*w2)*transpose(a0*transpose(a3-y))
+        w2_temp = w2 - LEARN_RATE*transpose(w3)*transpose(a1*transpose(a3-y))
+        w3_temp = w3 - LEARN_RATE*transpose(a2*transpose(a3-y))
 
         # change biases
-        b1_temp = b1 - LEARN_RATE*2*transpose(relu(w3*w2))*(a3-y)
-        b2_temp = b2 - LEARN_RATE*2*transpose(relu(w3))*(a3-y)
-        b3_temp = b3 - LEARN_RATE*2*(a3-y)
+        b1_temp = b1 - LEARN_RATE*transpose(w3*w2)*(a3-y)
+        b2_temp = b2 - LEARN_RATE*transpose(w3)*(a3-y)
+        b3_temp = b3 - LEARN_RATE*(a3-y)
 
         # update actual weights and biases to temp values
         w1 = w1_temp
@@ -84,4 +84,4 @@ function trainNeuralNet(a0::Array, y::Array)
     print(a3)
 end
 
-trainNeuralNet(INPUT_ARRAY, OUTPUT_ARRAY)
+fixedNeuralNet(INPUT_ARRAY, OUTPUT_ARRAY)
