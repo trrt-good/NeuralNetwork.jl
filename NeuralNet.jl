@@ -72,7 +72,7 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
             end
 
             # change change weights
-            weights_change[nLayers] -= avgMult*LEARN_RATE*transpose(activators[nLayers-1]*transpose(activators[nLayers]-outputData[nthExample])) #update the last weight on it's own because it's special 😄
+            weights_change[nLayers] -= avgMult*LEARN_RATE*transpose(activators[nLayers-1]*transpose(activators[nLayers]-outputData[nthExample])) #update the last weight on it's own because it's special
             for l in 1:nLayers-1
                 weightProduct = weights[l+1]
                 for lp in l+2:nLayers
