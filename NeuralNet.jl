@@ -1,7 +1,17 @@
 const LEARN_RATE = 0.01
 
-const INPUT_ARRAY = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0]]
-const OUTPUT_ARRAY =[[0, 1], [1, 0], [0, 0], [10, 10]]
+const INPUT_ARRAY = [
+    [1, 0, 0], 
+    [0, 1, 0], 
+    [0, 0, 1], 
+    [1, 1, 0]
+]
+const OUTPUT_ARRAY =[
+    [0, 1], 
+    [1, 0], 
+    [0, 0], 
+    [10, 10]
+]
 const NODES_EACH_LAYER = [3, 4, 4, 2]
 
 function validateArgs(nodesInEachLayer::Array, inputData::Array, outputData::Array)
@@ -40,8 +50,8 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
     # initialize neural network parts (weights, activators, biases) based on `nodesInEachLayer`:
 
     # weights (using an array of 2d matrices):
-    weights = Array{Matrix, 1}(undef, length(nodesInEachLayer)-1)
-    weights_change = Array{Matrix, 1}(undef, length(nodesInEachLayer)-1)
+    weights = Array{Matrix, 1}(undef, nLayers)
+    weights_change = Array{Matrix, 1}(undef, nLayers)
     for index in eachindex(weights)
         # first index of `nodesInEachLayer` is the input layer 
         # which doesnt have an associated weight matrix
@@ -50,14 +60,14 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
     end
 
     # activators (does not include input layer):
-    activators = Array{Vector, 1}(undef, length(nodesInEachLayer)-1)
+    activators = Array{Vector, 1}(undef, nLayers)
     for index in eachindex(activators)
-        activators[index] = rand(Float32, nodesInEachLayer[index])
+        activators[index] = rand(Float32, nodesInEachLayer[index+1])
     end
 
     # biases
-    biases = Array{Vector, 1}(undef, length(nodesInEachLayer)-1)
-    biases_change = Array{Vector, 1}(undef, length(nodesInEachLayer)-1)
+    biases = Array{Vector, 1}(undef, nLayers)
+    biases_change = Array{Vector, 1}(undef, nLayers)
     for index in eachindex(biases)
         biases[index] = rand(Float32, nodesInEachLayer[index + 1])
         biases_change[index] = fill(Float32(0), nodesInEachLayer[index + 1])
@@ -67,7 +77,7 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
         for nthExample in 1:nTrainingExamples
             # run data through the network
             activators[1] = relu(weights[1]*inputData[nthExample]+biases[1])
-            for a in 2:length(activators)
+            for a in 2:nLayers
                 activators[a] = relu(weights[a]*activators[a-1]+biases[a])
             end
 
@@ -112,11 +122,9 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
         for a in 2:length(activators)
             activators[a] = relu(weights[a]*activators[a-1]+biases[a])
         end
-
-        println("activators: $activators")
+        lastLayer = activators[nLayers]
+        println("activators: $lastLayer")
     end
-
-    
 end
 
 trainNeuralNet(NODES_EACH_LAYER, INPUT_ARRAY, OUTPUT_ARRAY)
