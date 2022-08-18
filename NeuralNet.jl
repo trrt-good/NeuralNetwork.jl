@@ -55,7 +55,7 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
     for index in eachindex(weights)
         # first index of `nodesInEachLayer` is the input layer 
         # which doesnt have an associated weight matrix
-        weights[index] = fill(Float32(1), (nodesInEachLayer[index + 1], nodesInEachLayer[index]))
+        weights[index] = rand(Float32, (nodesInEachLayer[index + 1], nodesInEachLayer[index]))
         weights_change[index] = fill(Float32(0), (nodesInEachLayer[index + 1], nodesInEachLayer[index]))
     end
 
@@ -69,7 +69,7 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
     biases = Array{Vector, 1}(undef, nLayers)
     biases_change = Array{Vector, 1}(undef, nLayers)
     for index in eachindex(biases)
-        biases[index] = fill(Float32(0), nodesInEachLayer[index + 1])
+        biases[index] = rand(Float32, nodesInEachLayer[index + 1])
         biases_change[index] = fill(Float32(0), nodesInEachLayer[index + 1])
     end
 
