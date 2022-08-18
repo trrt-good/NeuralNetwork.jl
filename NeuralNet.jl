@@ -55,21 +55,21 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
     for index in eachindex(weights)
         # first index of `nodesInEachLayer` is the input layer 
         # which doesnt have an associated weight matrix
-        weights[index] = rand(Float32, (nodesInEachLayer[index + 1], nodesInEachLayer[index]))
+        weights[index] = fill(Float32(1), (nodesInEachLayer[index + 1], nodesInEachLayer[index]))
         weights_change[index] = fill(Float32(0), (nodesInEachLayer[index + 1], nodesInEachLayer[index]))
     end
 
     # activators (does not include input layer):
     activators = Array{Vector, 1}(undef, nLayers)
     for index in eachindex(activators)
-        activators[index] = rand(Float32, nodesInEachLayer[index+1])
+        activators[index] = fill(Float32(1), nodesInEachLayer[index+1])
     end
 
     # biases
     biases = Array{Vector, 1}(undef, nLayers)
     biases_change = Array{Vector, 1}(undef, nLayers)
     for index in eachindex(biases)
-        biases[index] = rand(Float32, nodesInEachLayer[index + 1])
+        biases[index] = fill(Float32(0), nodesInEachLayer[index + 1])
         biases_change[index] = fill(Float32(0), nodesInEachLayer[index + 1])
     end
 
@@ -81,23 +81,27 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
                 activators[a] = relu(weights[a]*activators[a-1]+biases[a])
             end
 
-            # change change weights
+            # change bias and weight gradients
             weights_change[nLayers] -= avgMult*LEARN_RATE*transpose(activators[nLayers-1]*transpose(activators[nLayers]-outputData[nthExample])) #update the last weight on it's own because it's special
-            for l in 1:nLayers-1
-                weightProduct = weights[l+1]
-                for lp in l+2:nLayers
-                    weightProduct = weights[lp]*weightProduct
-                end
-                weights_change[l] -= avgMult*LEARN_RATE*(transpose(weightProduct)*transpose((l == 1 ? inputData[nthExample] : activators[l-1])*transpose(activators[nLayers]-outputData[nthExample])))
-            end
-
-            #change change biases 
             biases_change[nLayers] -= avgMult*LEARN_RATE*(activators[nLayers]-outputData[nthExample]) #update the last bias on it's own because it's special too
-            for l in 1:nLayers-1
-                weightProduct = weights[l+1]
-                for lp in l+2:nLayers
-                    weightProduct = weights[lp]*weightProduct
-                end
+
+            # for l in 1:nLayers-1
+            #     weightProduct = weights[l+1]
+            #     for lp in l+2:nLayers
+            #         weightProduct = weights[lp]*weightProduct
+            #     end
+            #     weights_change[l] -= avgMult*LEARN_RATE*(transpose(weightProduct)*transpose((l == 1 ? inputData[nthExample] : activators[l-1])*transpose(activators[nLayers]-outputData[nthExample])))
+            #     biases_change[l] -= avgMult*LEARN_RATE*(transpose(weightProduct)*(activators[nLayers]-outputData[nthExample]))
+            # end
+
+            weightProduct = weights[nLayers]
+
+            weights_change[nLayers-1] -= avgMult*LEARN_RATE*transpose(weights[nLayers])*transpose(activators[nLayers-2]*transpose(activators[nLayers]-outputData[nthExample]))
+            biases_change[nLayers-1] -= avgMult*LEARN_RATE*(transpose(weights[nLayers])*(activators[nLayers]-outputData[nthExample]))
+
+            for l in nLayers-2:1
+                weightProduct = weightProduct*weights[l+1]
+                weights_change[l] -= avgMult*LEARN_RATE*(transpose(weightProduct)*transpose((l == 1 ? inputData[nthExample] : activators[l-1])*transpose(activators[nLayers]-outputData[nthExample])))
                 biases_change[l] -= avgMult*LEARN_RATE*(transpose(weightProduct)*(activators[nLayers]-outputData[nthExample]))
             end
         end

@@ -26,8 +26,8 @@ b3: biases for layer 3
 """
 
 const LEARN_RATE = 0.01
-const INPUT_ARRAY = Array{Float32, 1}([1, -10, 3])
-const OUTPUT_ARRAY = Array{Float32, 1}([30, 50])
+const INPUT_ARRAY = Array{Float32, 1}([1, 0, 0])
+const OUTPUT_ARRAY = Array{Float32, 1}([0, 1])
 
 function relu(A)
     for i in eachindex(A)
@@ -41,47 +41,48 @@ function fixedNeuralNet(a0::Array, y::Array)
     a2 = fill(1.0, 4)
     a3 = fill(1.0, 2)
      
-    w1 = fill(1.0, (4, 3))
-    w2 = fill(1.0, (4, 4))
-    w3 = fill(1.0, (2, 4))
+    w1 = fill(1.5, (4, 3))
+    w2 = fill(1.5, (4, 4))
+    w3 = fill(1.5, (2, 4))
 
     b1 = fill(0.0, 4)
     b2 = fill(0.0, 4)
     b3 = fill(0.0, 2)
 
-    for i in 1:1000
+    for i in 1:1
         # run data through the network 
         a1 = relu(w1*a0+b1)
         a2 = relu(w2*a1+b2)
         a3 = relu(w3*a2+b3)
 
-        # change weights
-        w1_temp = w1 - LEARN_RATE*transpose(w3*w2)*transpose(a0*transpose(a3-y))
-        w2_temp = w2 - LEARN_RATE*transpose(w3)*transpose(a1*transpose(a3-y))
-        w3_temp = w3 - LEARN_RATE*transpose(a2*transpose(a3-y))
+        # # change weights
+        # w1_temp = w1 - LEARN_RATE*transpose(w3*w2)*transpose(a0*transpose(a3-y))
+        w2_temp = LEARN_RATE*transpose(w3)*transpose(a1*transpose(a3-y))
+        # w3_temp = LEARN_RATE*transpose(a2*transpose(a3-y))
 
-        # change biases
-        b1_temp = b1 - LEARN_RATE*transpose(w3*w2)*(a3-y)
-        b2_temp = b2 - LEARN_RATE*transpose(w3)*(a3-y)
-        b3_temp = b3 - LEARN_RATE*(a3-y)
+        # # change biases
+        # b1_temp = b1 - LEARN_RATE*transpose(w3*w2)*(a3-y)
+        b2_temp = LEARN_RATE*transpose(w3)*(a3-y)
+        # b3_temp = LEARN_RATE*(a3-y)
 
-        # update actual weights and biases to temp values
-        w1 = w1_temp
-        w2 = w2_temp
-        w3 = w3_temp
+        # # update actual weights and biases to temp values
+        # w1 = w1_temp
+        # w2 = w2_temp
+        # w3 = w3_temp
 
-        b1 = b1_temp
-        b2 = b2_temp
-        b3 = b3_temp
+        # b1 = b1_temp
+        # b2 = b2_temp
+        # b3 = b3_temp
 
-        print(a1)
-        print(a2)
-        println(a3)
+        print(b2_temp)
+        print(w2_temp)
+        print(size(w2_temp))
+
     end
 
-    a1 = relu(w1*a0+b1)
-    a2 = relu(w2*a1+b2)
-    a3 = relu(w3*a2+b3)
+    # a1 = relu(w1*a0+b1)
+    # a2 = relu(w2*a1+b2)
+    # a3 = relu(w3*a2+b3)
 
     print(a3)
 end
