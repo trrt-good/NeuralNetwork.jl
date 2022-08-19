@@ -1,4 +1,4 @@
-const LEARN_RATE = 0.01
+const LEARN_RATE = 0.000001
 
 const INPUT_ARRAY = [
     [1, 0, 0], 
@@ -12,7 +12,7 @@ const OUTPUT_ARRAY =[
     [0, 0], 
     [10, 10]
 ]
-const NODES_EACH_LAYER = [3, 4, 4, 2]
+const NODES_EACH_LAYER = [3, 5, 10, 15, 20, 2]
 
 function validateArgs(nodesInEachLayer::Array, inputData::Array, outputData::Array)
     # do some checks like matching lengths of input and output 
@@ -62,7 +62,7 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
     # activators (does not include input layer):
     activators = Array{Vector, 1}(undef, nLayers)
     for index in eachindex(activators)
-        activators[index] = fill(Float32(1), nodesInEachLayer[index+1])
+        activators[index] = rand(Float32, nodesInEachLayer[index+1])
     end
 
     # biases
@@ -73,7 +73,7 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
         biases_change[index] = fill(Float32(0), nodesInEachLayer[index + 1])
     end
 
-    for i in 1:10000
+    for i in 1:10000000
         for nthExample in 1:nTrainingExamples
             # run data through the network
             activators[1] = relu(weights[1]*inputData[nthExample]+biases[1])
@@ -96,20 +96,20 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
 
             weightProduct = weights[nLayers]
 
-            weights_change[nLayers-1] -= avgMult*LEARN_RATE*transpose(weights[nLayers])*transpose(activators[nLayers-2]*transpose(activators[nLayers]-outputData[nthExample]))
-            biases_change[nLayers-1] -= avgMult*LEARN_RATE*(transpose(weights[nLayers])*(activators[nLayers]-outputData[nthExample]))
+            weights_change[nLayers-1] += avgMult*LEARN_RATE*transpose(weights[nLayers])*transpose(activators[nLayers-2]*transpose(activators[nLayers]-outputData[nthExample]))
+            biases_change[nLayers-1] += avgMult*LEARN_RATE*(transpose(weights[nLayers])*(activators[nLayers]-outputData[nthExample]))
 
             for l in nLayers-2:1
                 weightProduct = weightProduct*weights[l+1]
-                weights_change[l] -= avgMult*LEARN_RATE*(transpose(weightProduct)*transpose((l == 1 ? inputData[nthExample] : activators[l-1])*transpose(activators[nLayers]-outputData[nthExample])))
-                biases_change[l] -= avgMult*LEARN_RATE*(transpose(weightProduct)*(activators[nLayers]-outputData[nthExample]))
+                weights_change[l] += avgMult*LEARN_RATE*(transpose(weightProduct)*transpose((l == 1 ? inputData[nthExample] : activators[l-1])*transpose(activators[nLayers]-outputData[nthExample])))
+                biases_change[l] += avgMult*LEARN_RATE*(transpose(weightProduct)*(activators[nLayers]-outputData[nthExample]))
             end
         end
 
         #update biases and weights to change values
         for index in 1:nLayers
-            weights[index] = weights[index] + weights_change[index]
-            biases[index] = biases[index] + biases_change[index]
+            weights[index] = weights[index] - weights_change[index]
+            biases[index] = biases[index] - biases_change[index]
         end
 
         resetToZero(weights_change)
