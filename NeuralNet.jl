@@ -1,4 +1,4 @@
-const LEARN_RATE = 0.000001
+const LEARN_RATE = 0.0005
 
 const INPUT_ARRAY = [
     [1, 0, 0], 
@@ -12,7 +12,7 @@ const OUTPUT_ARRAY =[
     [0, 0], 
     [10, 10]
 ]
-const NODES_EACH_LAYER = [3, 5, 10, 15, 20, 2]
+const NODES_EACH_LAYER = [3, 4, 4, 2]
 
 function validateArgs(nodesInEachLayer::Array, inputData::Array, outputData::Array)
     # do some checks like matching lengths of input and output 
@@ -73,7 +73,7 @@ function trainNeuralNet(nodesInEachLayer::Array, inputData::Array, outputData::A
         biases_change[index] = fill(Float32(0), nodesInEachLayer[index + 1])
     end
 
-    for i in 1:10000000
+    for i in 1:10000
         for nthExample in 1:nTrainingExamples
             # run data through the network
             activators[1] = relu(weights[1]*inputData[nthExample]+biases[1])
