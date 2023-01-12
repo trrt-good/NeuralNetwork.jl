@@ -10,6 +10,7 @@ L2 : 4 nodes (hidden layer)
 L3 : 2 nodes (output layer)
 
 a0: input data
+
 a1: value of nodes in layer 1
 a2: value of nodes in layer 2
 a3: value of nodes in layer 3
